@@ -7,7 +7,7 @@ from discord.ext.commands import has_permissions
 #Important
 client = commands.Bot(command_prefix='$')
 client.remove_command("help")
-ignoreChannels = []
+ignoreChannels = [] #Add the id of your #logs channel for example
 
 #Ready message
 @client.event
@@ -31,6 +31,14 @@ async def emojis(ctx):
                     for Emoji in Emojis:
                         if Emoji in message.content:
                             Counter[Emoji] = Counter[Emoji]+1
+
+    if not ignoreChannels: #This is needed so the bot works even when ignoreChannels is empty
+        for Channel in ctx.guild.text_channels:
+            async for message in Channel.history():
+                for Emoji in Emojis:
+                    if Emoji in message.content:
+                         Counter[Emoji] = Counter[Emoji]+1
+
     message = ""
     for Key, Value in Counter.items():
         message = message + "{0}: {1}\n".format(Key,Value)
