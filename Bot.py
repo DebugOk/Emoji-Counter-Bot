@@ -60,7 +60,7 @@ async def emojilist(ctx):
     for Key, Value in emojiList.items():
         temp = temp + "{0}, {1}\n".format(Key,Value)
     f = open("temp.txt", "w")
-    f.write(temp)
+    f.write(temp.rstrip())
     f.close()
     await ctx.send(file=discord.File('temp.txt'))
 
