@@ -49,6 +49,25 @@ async def emojis(ctx):
 async def kick_error(ctx, error):
     await ctx.send("You don't have permission to do that or an error occured!")
 
+@client.command()
+@has_permissions(manage_messages=True) 
+async def emojilist(ctx):
+    await ctx.send("I'm working on it...")
+    emojiList = {}
+    for Emoji in ctx.guild.emojis: #Get the emoji list ready
+        emojiList["<:{0}:{1}>".format(Emoji.name,Emoji.id)] = ":{0}:".format(Emoji.name)
+    temp = ""
+    for Key, Value in emojiList.items():
+        temp = temp + "{0}, {1}\n".format(Key,Value)
+    f = open("temp.txt", "w")
+    f.write(temp)
+    f.close()
+    await ctx.send(file=discord.File('temp.txt'))
+
+@emojilist.error
+async def emojilist_error(ctx, error):
+    await ctx.send("You don't have permission to do that or an error occured!")
+
 #Ping command
 @client.command()
 async def ping(ctx):
