@@ -15,6 +15,7 @@ from zipfile import ZipFile
 client = commands.Bot(command_prefix='$')
 client.remove_command("help")
 ignoreChannels = [] #Add the id of your #logs channel for example
+allowEval = False #Please do not enable this unless you have an reason to eval
 
 #Ready message
 @client.event
@@ -29,7 +30,7 @@ else:
     time.sleep(.6)
     os.makedirs('temp')
 
-#Main command
+#Show a list of all emojis and how much they are used.
 @client.command()
 @has_permissions(manage_messages=True) 
 async def emojis(ctx):
@@ -68,10 +69,6 @@ async def emojis(ctx):
         message = message + "{0}: {1}\n".format(emoji,Value)
     embed = discord.Embed(title="Emoji occurrences", description=message)
     await ctx.send(embed=embed)
-#Command error message
-@emojis.error
-async def kick_error(ctx, error):
-    await ctx.send("You don't have permission to do that or an error occured!")
 
 #Return a list of all current emojis
 @client.command()
@@ -91,10 +88,6 @@ async def emojilist(ctx):
     f.write(temp.rstrip())
     f.close()
     await ctx.send(file=discord.File('temp.txt'))
-#Command error message
-@emojilist.error
-async def emojilist_error(ctx, error):
-    await ctx.send("You don't have permission to do that or an error occured!")
 
 #Return a zip of all current emojis
 @client.command()
@@ -122,15 +115,10 @@ async def emojidump(ctx):
     zipObj.close()
 
     await ctx.send("Done",file=discord.File('temp/emojiDump.zip'))
-#Command error message
-@emojidump.error
-async def emojidump_error(ctx, error):
-    await ctx.send("You don't have permission to do that or an error occured!")
 
 #Ping command
 @client.command()
 async def ping(ctx):
-    print("Running test command!")
     embedVar = discord.Embed(title="Pong!", description="Got a reply in {0}".format(round(client.latency, 1)), color=0x4287f5,timestamp=datetime.now())
     await ctx.send(embed=embedVar)
 
@@ -138,6 +126,9 @@ async def ping(ctx):
 @client.command(name='eval', pass_context=True)
 @has_permissions(administrator=True) 
 async def eval_(ctx, *, command):
+    if not allowEval:
+        await ctx.send("Eval has been disabled. If you have access to this bot's source you can enable it by setting `allowEval` to true.")
+        return
     try:
         res = eval(command)
         if inspect.isawaitable(res): 
@@ -152,10 +143,23 @@ async def eval_(ctx, *, command):
 #Main error thing
 @client.event
 async def on_command_error(ctx, error):
-    if not isinstance(error, commands.CheckFailure): 
-        print(error)
+    print(error)
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send("Command not found\n```{0}```".format(error))
+    elif isinstance(error, commands.MissingPermissions):
+        await ctx.send("You don't have permission to do that!\n```{0}```".format(error))
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("You are missing a required argument!\n```{0}```".format(error))
+    elif isinstance(error, commands.BadArgument):
+        await ctx.send("Invalid argument!\n```{0}```".format(error))
+    elif isinstance(error, commands.CommandError) or isinstance(error,commands.CommandInvokeError):
         await ctx.message.add_reaction('❌')
-        await ctx.reply("No such command or an error occured!", mention_author=False)
+        try:
+            await ctx.send("An error has occured!\n```{0}```".format(error)) #This error can possibly go past Discord's character limit. Better safe then sorry.
+        except:
+            await ctx.send("An error has occured!")
+    else: 
+        await ctx.send("An unknown error has occured!")
 
 #Sign in
 client.run('')
