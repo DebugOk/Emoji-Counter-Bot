@@ -1,7 +1,7 @@
 #Imports 
 import discord
 from discord.ext import commands
-from discord.ext.commands import has_permissions
+from discord.ext.commands import has_permissions,when_mentioned_or
 from discord.utils import get
 
 from datetime import datetime, timezone
@@ -12,11 +12,13 @@ import shutil
 import inspect
 from zipfile import ZipFile
 #Important
-client = commands.Bot(command_prefix='$')
+Prefix = '$' #Change the prefix here
+
+client = commands.Bot(command_prefix=when_mentioned_or(Prefix))
 client.remove_command("help")
 ignoreChannels = [] #Add the id of your #logs channel for example
 allowEval = False #Please do not enable this unless you have an reason to eval
-
+version = 3.0
 #Ready message
 @client.event
 async def on_ready():
@@ -143,7 +145,7 @@ async def eval_(ctx, *, command):
 #Help command
 @client.command()
 async def help(ctx):
-    embed = discord.Embed(title="Help", description="Current prefix: {0}\n\nCurrent version: {1}".format(client.command_prefix,version), color=0x08ffa0, timestamp=datetime.now())
+    embed = discord.Embed(title="Help", description="Current prefix: {0}\n\nCurrent version: {1}".format(Prefix,version), color=0x08ffa0, timestamp=datetime.now())
     embed.add_field(name="emojis", value="This command will search for how many messages contain each custom emoji.\n\n**Required permissions:** Manage messages", inline=True)
     embed.add_field(name="emojilist",value="This command will put all of the server's custom emoji name's and their fancy programmer name's into a handy txt file.\n\n**Required permission:** Manage messages",inline=True)
     embed.add_field(name="emojidump",value="This command will download a copy of every custom emoji in the server and put them into a zip file, then upload that zip file for downloading.\n\n**Required permissions:** Manage messages",inline=True)
