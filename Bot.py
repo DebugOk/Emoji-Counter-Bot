@@ -140,6 +140,24 @@ async def eval_(ctx, *, command):
     except Exception as e:
         await ctx.send("Eval unsuccessful!\n```{0}```".format(e))
 
+#Help command
+@client.command()
+async def help(ctx):
+    embed = discord.Embed(title="Help", description="Current prefix: {0}\n\nCurrent version: {1}".format(client.command_prefix,version), color=0x08ffa0, timestamp=datetime.now())
+    embed.add_field(name="emojis", value="This command will search for how many messages contain each custom emoji.\n\n**Required permissions:** Manage messages", inline=True)
+    embed.add_field(name="emojilist",value="This command will put all of the server's custom emoji name's and their fancy programmer name's into a handy txt file.\n\n**Required permission:** Manage messages",inline=True)
+    embed.add_field(name="emojidump",value="This command will download a copy of every custom emoji in the server and put them into a zip file, then upload that zip file for downloading.\n\n**Required permissions:** Manage messages",inline=True)
+    embed.add_field(name="ping",value="This will check how fast the bot can reach Discord. It doesn't do anything special.\n\n**Required permissions:** *None*",inline=True)
+    if allowEval:
+        embed.add_field(name="eval",value="This is a testing command that allows for single line Python code execution. **This should normally be disabled! If you don't use this then disable this command!**\n\n**Required permissions:** Administrator",inline=True)
+    embed.add_field(name="help",value="I wonder what this does...\n\n**Required permissions:** *None*",inline=True)
+
+    #If you don't want to credit me/change the credit you can comment/edit the line below
+    embed.set_author(name="Bot created by DebugOk#6605", url="https://ko-fi.com/debugok", icon_url="https://cdn.discordapp.com/avatars/282227463642415104/f6d632f4fa73a7ff947ebba43277cf11.webp")
+    #If you don't want to credit me/change the credit you can comment/edit the line above
+    
+    await ctx.send(embed=embed)
+
 #Main error thing
 @client.event
 async def on_command_error(ctx, error):
